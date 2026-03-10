@@ -112,25 +112,33 @@ export default function Dashboard() {
         </h1>
 
         {/* Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-xl shadow-sm">
-            <p className="text-sm text-[#8C5A3C] mb-1">Pemasukan</p>
-            <h2 className="text-xl font-bold text-green-600">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+          {/* Saldo */}
+          <div className="col-span-2 sm:col-span-1 bg-white p-5 rounded-xl shadow-sm">
+            <p className="text-sm text-[#8C5A3C] mb-1">Saldo</p>
+
+            <h2 className="text-xl md:text-2xl font-bold text-[#4B2E2B] leading-tight break-words">
+              {formatRupiah(balance)}
+            </h2>
+          </div>
+
+          {/* Duit Masuk */}
+          <div className="bg-white p-4 rounded-xl shadow-sm">
+            <p className="text-xs sm:text-sm text-[#8C5A3C] mb-1">Duit Masuk</p>
+
+            <h2 className="text-base sm:text-lg font-bold text-green-600 leading-tight break-words">
               {formatRupiah(income)}
             </h2>
           </div>
 
-          <div className="bg-white p-5 rounded-xl shadow-sm">
-            <p className="text-sm text-[#8C5A3C] mb-1">Pengeluaran</p>
-            <h2 className="text-xl font-bold text-red-600">
-              {formatRupiah(expense)}
-            </h2>
-          </div>
+          {/* Duit Keluar */}
+          <div className="bg-white p-4 rounded-xl shadow-sm">
+            <p className="text-xs sm:text-sm text-[#8C5A3C] mb-1">
+              Duit Keluar
+            </p>
 
-          <div className="bg-white p-5 rounded-xl shadow-sm">
-            <p className="text-sm text-[#8C5A3C] mb-1">Saldo</p>
-            <h2 className="text-xl font-bold text-[#4B2E2B]">
-              {formatRupiah(balance)}
+            <h2 className="text-base sm:text-lg font-bold text-red-600 leading-tight break-words">
+              {formatRupiah(expense)}
             </h2>
           </div>
         </div>
@@ -162,8 +170,8 @@ export default function Dashboard() {
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
-              <option value="expense">Pengeluaran</option>
-              <option value="income">Pemasukan</option>
+              <option value="expense">Duit Keluar</option>
+              <option value="income">Duit Masuk</option>
             </select>
 
             <button
