@@ -10,13 +10,25 @@ type Transaction = {
   type: string;
 };
 
+const formatRupiah = (number: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(number);
+};
+
+const formatInputRupiah = (value: string) => {
+  const number = value.replace(/\D/g, "");
+  return new Intl.NumberFormat("id-ID").format(Number(number));
+};
+
 export default function Dashboard() {
-  const [title, setTitle] = useState<string>("");
-  const [amount, setAmount] = useState<number>(0);
-  const [type, setType] = useState<string>("expense");
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState<string>("");
+  const [type, setType] = useState("expense");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // ambil transaksi
   const getTransactions = async () => {
     const { data } = await supabase
       .from("transactions")
@@ -26,7 +38,11 @@ export default function Dashboard() {
     if (data) setTransactions(data);
   };
 
-  // tambah transaksi
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setAmount(formatInputRupiah(value));
+  };
+
   const addTransaction = async () => {
     const {
       data: { user },
@@ -37,10 +53,12 @@ export default function Dashboard() {
       return;
     }
 
+    const cleanAmount = Number(amount.replace(/\./g, ""));
+
     const { error } = await supabase.from("transactions").insert([
       {
         title,
-        amount,
+        amount: cleanAmount,
         type,
         user_id: user.id,
       },
@@ -50,33 +68,31 @@ export default function Dashboard() {
       alert(error.message);
     } else {
       setTitle("");
-      setAmount(0);
+      setAmount("");
       getTransactions();
     }
   };
 
-  // hapus transaksi
   const deleteTransaction = async (id: string) => {
     await supabase.from("transactions").delete().eq("id", id);
     getTransactions();
   };
 
   useEffect(() => {
-  const loadTransactions = async () => {
-    const { data } = await supabase
-      .from("transactions")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const loadTransactions = async () => {
+      const { data } = await supabase
+        .from("transactions")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (data) {
-      setTransactions(data);
-    }
-  };
+      if (data) {
+        setTransactions(data);
+      }
+    };
 
-  loadTransactions();
-}, []);
+    loadTransactions();
+  }, []);
 
-  // hitung total
   const income = transactions
     .filter((t) => t.type === "income")
     .reduce((acc, t) => acc + t.amount, 0);
@@ -88,89 +104,116 @@ export default function Dashboard() {
   const balance = income - expense;
 
   return (
-    <div className="p-10 max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[#FFF8F0] px-4 py-6 md:p-10">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <h1 className="text-2xl md:text-3xl font-bold text-[#4B2E2B] mb-6">
+          DompetDuit
+        </h1>
 
-      <h1 className="text-3xl font-bold mb-6">Finance Dashboard</h1>
+        {/* Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white p-5 rounded-xl shadow-sm">
+            <p className="text-sm text-[#8C5A3C] mb-1">Pemasukan</p>
+            <h2 className="text-xl font-bold text-green-600">
+              {formatRupiah(income)}
+            </h2>
+          </div>
 
-      {/* summary */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-green-100 p-4 rounded">
-          <p>Pemasukan</p>
-          <h2 className="text-xl font-bold">Rp {income}</h2>
+          <div className="bg-white p-5 rounded-xl shadow-sm">
+            <p className="text-sm text-[#8C5A3C] mb-1">Pengeluaran</p>
+            <h2 className="text-xl font-bold text-red-600">
+              {formatRupiah(expense)}
+            </h2>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow-sm">
+            <p className="text-sm text-[#8C5A3C] mb-1">Saldo</p>
+            <h2 className="text-xl font-bold text-[#4B2E2B]">
+              {formatRupiah(balance)}
+            </h2>
+          </div>
         </div>
 
-        <div className="bg-red-100 p-4 rounded">
-          <p>Pengeluaran</p>
-          <h2 className="text-xl font-bold">Rp {expense}</h2>
-        </div>
+        {/* Form */}
+        <div className="bg-white p-5 rounded-xl shadow-sm mb-8">
+          <h2 className="font-semibold text-[#4B2E2B] mb-4">
+            Tambah Transaksi
+          </h2>
 
-        <div className="bg-blue-100 p-4 rounded">
-          <p>Saldo</p>
-          <h2 className="text-xl font-bold">Rp {balance}</h2>
-        </div>
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <input
+              className="border p-3 rounded-lg text-[#4B2E2B] placeholder:text-[#8C5A3C] focus:outline-none focus:ring-2 focus:ring-[#C08552]"
+              placeholder="Nama transaksi"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
 
-      {/* form */}
-      <div className="flex gap-2 mb-6">
-        <input
-          className="border p-2"
-          placeholder="Nama transaksi"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+            <input
+              className="border p-3 rounded-lg text-[#4B2E2B] placeholder:text-[#8C5A3C] focus:outline-none focus:ring-2 focus:ring-[#C08552]"
+              inputMode="numeric"
+              placeholder="Jumlah"
+              value={amount}
+              onChange={handleAmountChange}
+            />
 
-        <input
-          className="border p-2"
-          type="number"
-          placeholder="Jumlah"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
-
-        <select
-          className="border p-2"
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="expense">Pengeluaran</option>
-          <option value="income">Pemasukan</option>
-        </select>
-
-        <button
-          onClick={addTransaction}
-          className="bg-blue-500 text-white px-4"
-        >
-          Tambah
-        </button>
-      </div>
-
-      {/* list transaksi */}
-      <div className="space-y-3">
-        {transactions.map((t) => (
-          <div
-            key={t.id}
-            className="flex justify-between items-center border p-3 rounded"
-          >
-            <div>
-              <p className="font-semibold">{t.title}</p>
-              <p
-                className={
-                  t.type === "income"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }
-              >
-                Rp {t.amount}
-              </p>
-            </div>
+            <select
+              className="border p-3 rounded-lg text-[#4B2E2B] focus:outline-none focus:ring-2 focus:ring-[#C08552]"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              <option value="expense">Pengeluaran</option>
+              <option value="income">Pemasukan</option>
+            </select>
 
             <button
-              onClick={() => deleteTransaction(t.id)}
-              className="text-red-500"
+              onClick={addTransaction}
+              className="bg-[#C08552] text-white rounded-lg py-3 hover:bg-[#8C5A3C] transition w-full"
             >
-              Hapus
+              Tambah
             </button>
           </div>
-        ))}
+        </div>
+
+        {/* List transaksi */}
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-5 border-b">
+            <h2 className="font-semibold text-[#4B2E2B]">Riwayat Transaksi</h2>
+          </div>
+
+          {transactions.length === 0 && (
+            <p className="p-6 text-center text-[#8C5A3C]">
+              Belum ada transaksi
+            </p>
+          )}
+
+          <div className="divide-y">
+            {transactions.map((t) => (
+              <div key={t.id} className="flex items-center justify-between p-4">
+                <div>
+                  <p className="font-medium text-[#4B2E2B]">{t.title}</p>
+
+                  <p
+                    className={
+                      t.type === "income"
+                        ? "text-green-600 font-medium"
+                        : "text-red-600 font-medium"
+                    }
+                  >
+                    {formatRupiah(t.amount)}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => deleteTransaction(t.id)}
+                  className="text-sm text-red-500 hover:text-red-700"
+                >
+                  Hapus
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

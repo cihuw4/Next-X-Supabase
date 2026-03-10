@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Register() {
   const router = useRouter();
@@ -25,28 +26,39 @@ export default function Register() {
   };
 
   return (
-    <div className="p-10">
-      <h1 className="text-xl mb-4">Register</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0] px-6">
+      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-bold text-[#4B2E2B] mb-6 text-center">
+          Daftar
+        </h1>
 
-      <input
-        className="border p-2 block mb-3"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <input
+          className="w-full border border-gray-300 p-3 rounded-lg mb-4 text-[#4B2E2B] placeholder:text-[#8C5A3C] focus:outline-none focus:ring-2 focus:ring-[#C08552]"
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <input
-        className="border p-2 block mb-3"
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <input
+          className="w-full border border-gray-300 p-3 rounded-lg mb-4 text-[#4B2E2B] placeholder:text-[#8C5A3C] focus:outline-none focus:ring-2 focus:ring-[#C08552]"
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      <button
-        onClick={handleRegister}
-        className="bg-blue-500 text-white px-4 py-2"
-      >
-        Register
-      </button>
+        <button
+          onClick={handleRegister}
+          className="w-full bg-[#C08552] text-white py-3 rounded-lg font-medium hover:bg-[#8C5A3C] transition"
+        >
+          Register
+        </button>
+
+        <p className="text-sm text-center mt-6 text-[#8C5A3C]">
+          Sudah punya akun?{" "}
+          <Link href="/login" className="font-semibold text-[#4B2E2B]">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
