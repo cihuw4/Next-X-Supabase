@@ -25,9 +25,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0] px-6">
-      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-[#4B2E2B] mb-6 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0] px-4 sm:px-6">
+      <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#4B2E2B] mb-6 text-center">
           Masuk
         </h1>
 
