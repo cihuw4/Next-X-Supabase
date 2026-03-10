@@ -73,10 +73,10 @@ export default function Dashboard() {
     }
   };
 
-  const deleteTransaction = async (id: string) => {
-    await supabase.from("transactions").delete().eq("id", id);
-    getTransactions();
-  };
+  // const deleteTransaction = async (id: string) => {
+  //   await supabase.from("transactions").delete().eq("id", id);
+  //   getTransactions();
+  // };
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -229,12 +229,12 @@ export default function Dashboard() {
                   </p>
                 </div>
 
-                <button
+                {/* <button
                   onClick={() => deleteTransaction(t.id)}
                   className="text-sm text-red-500 hover:text-red-700"
                 >
                   Hapus
-                </button>
+                </button> */}
               </div>
             ))}
 
